@@ -31,6 +31,5 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/Phi-Nguyen-Project/BitFitWeek5/blob/master/bitfit_walkthrough.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 
