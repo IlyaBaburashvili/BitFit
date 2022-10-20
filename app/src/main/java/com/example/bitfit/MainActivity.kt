@@ -1,61 +1,58 @@
 package com.example.bitfit
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-
+import androidx.recyclerview.widget.RecyclerView
+import com.example.bitfit.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private val newFoodActivityRequestCode = 1
-    private lateinit var itemViewModel: ItemViewModel
-
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        val recyclerView = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvFood)
-        val adapter = FoodItemAdapter(this)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        itemViewModel = ViewModelProviders.of(this).get(ItemViewModel::class.java)
+        val fragmentManager: FragmentManager = supportFragmentManager
 
-        itemViewModel.allItems.observe(this, Observer { food ->
-            food?.let { adapter.setFood(it) }
-        })
+        // define your fragments here
+        val dashboardFragment: Fragment = DashboardFragment()
+        val logFragment: Fragment = LogFragment()
 
-        findViewById<Button>(R.id.addNewRecord).setOnClickListener{
-            val intent = Intent(this, AddFood::class.java)
-            startActivityForResult(intent, newFoodActivityRequestCode)
-        }
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
 
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intentData)
-
-        if (requestCode == newFoodActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            intentData?.let { data ->
-                val food = FoodItem(0,data.getStringExtra(AddFood.EXTRA_FOOD), data.getStringExtra(AddFood.EXTRA_CALORIES)?.toInt())
-                itemViewModel.insert(food)
+        // handle navigation selection
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            lateinit var fragment: Fragment
+            when (item.itemId) {
+                R.id.action_dashboard -> fragment = dashboardFragment
+                R.id.action_log -> fragment = logFragment
             }
-        } else {
-            Toast.makeText(
-                applicationContext,
-                "Not saved",
-                Toast.LENGTH_LONG
-            ).show()
+            replaceFragment(fragment)
+            true
         }
+
+        // Set default selection
+        bottomNavigationView.selectedItemId = R.id.action_log
     }
 
-
-
+    private fun replaceFragment(fragment: Fragment) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.entry_frame_layout, fragment)
+        fragmentTransaction.commit()
+    }
 }
