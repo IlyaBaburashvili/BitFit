@@ -21,7 +21,7 @@ class LogFragment : Fragment() {
     private lateinit var uploadButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState)///
     }
 
     override fun onCreateView(
